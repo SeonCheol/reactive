@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 // Reactive 변경사항이 생길경우 그것에 대한 대응 방식?
 @SuppressWarnings("unused")
@@ -55,48 +57,33 @@ public class Reactve01Toby {
 	static class IntObservable extends Observable implements Runnable	{
 
 		public void run() {
+			for(int i = 1; i <= 10; i++) {
+				setChanged();
+				notifyObservers(i); // push	
+				// int i = it.next(); 	// pull
+			}
 		}
-		
+
 	}
 
 	public static void main(String[] args) {
 		// Source -> Event/Data -> Observer
 		// Subscriber
 		Observer ob = new Observer() {
-			
+
 			public void update(Observable o, Object arg) {
-				System.out.println(arg);
+				System.out.println(Thread.currentThread().getName() + "-" + arg);
 			}
 		};
-		
+
 		IntObservable io = new IntObservable();
 		io.addObserver(ob);
-		
-		io.run();
-		
+
+		ExecutorService es = Executors.newSingleThreadExecutor();
+		es.execute(io);
+		System.out.println(Thread.currentThread().getName() + " EXIT ");
+		es.shutdown();
+
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
