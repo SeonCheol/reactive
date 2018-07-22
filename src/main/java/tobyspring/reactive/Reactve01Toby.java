@@ -52,6 +52,11 @@ public class Reactve01Toby {
 	//
 	//	}
 	
+	/* 
+	 * 문제제기
+	 * 1. Complete???
+	 * 2. error
+	 */
 	
 	// Data Source
 	static class IntObservable extends Observable implements Runnable	{
