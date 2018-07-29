@@ -1,10 +1,13 @@
 package tobyspring.reactive;
 
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Flow.*;
 import java.util.concurrent.Future;
 
 /**
@@ -35,7 +38,7 @@ public class PubSub {
                             try {
                                 int i = 0;
 //                                while (n-- > 0) {
-                                while(i++ < n)  {
+                                while (i++ < n) {
                                     if (it.hasNext()) {
                                         subscriber.onNext(it.next());
                                     } else {

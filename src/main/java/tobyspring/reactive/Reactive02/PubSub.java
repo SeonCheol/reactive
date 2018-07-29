@@ -23,7 +23,7 @@ public class PubSub {
 //        Publisher<String> mapPub = mapPub(pub, s -> "[" + s + "]");
 //        Publisher<Integer> map2Pub = mapPub(mapPub, i -> -i);
 //        Publisher<Integer> sumPub = sumPub(pub);
-        Publisher<String> reducePub = reducePub(pub, "", (a, b) -> a + "-" + b);
+        Publisher<StringBuilder> reducePub = reducePub(pub, new StringBuilder(), (a, b) -> a.append(b));
         // 실제 구독
         reducePub.subscribe(logSub());
     }
