@@ -29,13 +29,13 @@ public class PubSub {
     }
 
     //
-    private static Publisher<String> reducePub(Publisher<Integer> pub, String initVal, BiFunction<String, Integer, String> bf) {
+    private static <T, R> Publisher<R> reducePub(Publisher<T> pub, R initVal, BiFunction<R, T, R> bf) {
         return (sub) -> {
-            pub.subscribe(new DelegateSub<Integer, String>(sub) {
-                String result = initVal;
+            pub.subscribe(new DelegateSub<T, R>(sub) {
+                R result = initVal;
 
                 @Override
-                public void onNext(Integer i) {
+                public void onNext(T i) {
                     result = bf.apply(result, i);
                 }
 
