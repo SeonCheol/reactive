@@ -19,35 +19,41 @@ import org.reactivestreams.Subscription;
 public class PubSub {
     public static void main(String[] args) {
         Publisher<Integer> pub = iterPub(Stream.iterate(1, a -> a + 1).limit(10).collect(Collectors.toList()));
-        Publisher<Integer> mapPub = mapPub(pub, i -> i * 10);
-        Publisher<Integer> map2Pub = mapPub(mapPub, i -> -i);
+//        Publisher<Integer> mapPub = mapPub(pub, i -> i * 10);
+//        Publisher<Integer> map2Pub = mapPub(mapPub, i -> -i);
+        Publisher<Integer> sumPub = sumPub(pub);
         // 실제 구독
-        map2Pub.subscribe(logSub());
+        sumPub.subscribe(logSub());
+    }
+
+    private static Publisher<Integer> sumPub(Publisher<Integer> pub) {
+        return new Publisher<Integer>() {
+            @Override
+            public void subscribe(Subscriber<? super Integer> sub) {
+                pub.subscribe(new DelegateSub(sub)  {
+                    int sum = 0;
+                    @Override
+                    public void onNext(Integer i)   {
+                        sum += i;
+                    }
+                    @Override
+                    public void onComplete()    {
+                        sub.onNext(sum);
+                        sub.onComplete();
+                    }
+                });
+            }
+        };
     }
 
     private static Publisher<Integer> mapPub(Publisher<Integer> pub, Function<Integer, Integer> f) {
         return new Publisher<Integer>() {
             @Override
             public void subscribe(Subscriber<? super Integer> sub) {
-                pub.subscribe(new Subscriber<Integer>() {
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                        sub.onSubscribe(s); // 중개 역할
-                    }
-
+                pub.subscribe(new DelegateSub(sub) {
                     @Override
                     public void onNext(Integer i) {
                         sub.onNext(f.apply(i));
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-                        sub.onError(t);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        sub.onComplete();
                     }
                 });
             }
