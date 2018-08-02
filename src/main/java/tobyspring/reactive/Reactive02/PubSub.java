@@ -31,7 +31,7 @@ public class PubSub {
     //
     private static <T, R> Publisher<R> reducePub(Publisher<T> pub, R initVal, BiFunction<R, T, R> bf) {
         return (sub) -> {
-            pub.subscribe(new DelegateSub<T, R>(sub) {
+            pub.subscribe(new Subscriber<T>(sub) {
                 R result = initVal;
 
                 @Override
