@@ -20,6 +20,10 @@ public class PubSub {
 		/*
 		 * A Publisher is a provider of a potentially unbounded number of sequenced elements, publishing them according to the demand received from its Subscriber(s).
 		 */
+		
+		/**
+		 * 1. Publisher & Subscriber 기본 구현
+		 */
 		//    	Iterable<Integer> itr = Arrays.asList(1, 2, 3, 4, 5);
 		//    	
 		//    	Publisher p = new Publisher() {
@@ -58,6 +62,9 @@ public class PubSub {
 		//    	
 		//    	p.subscribe(s);
 
+		/**
+		 * 2. 실제 데이터 넘기는 구현
+		 */
 //		Iterable<Integer> itr = Arrays.asList(1, 2, 3, 4, 5);
 //
 //		Publisher p = new Publisher() {
@@ -113,6 +120,10 @@ public class PubSub {
 //		};
 //
 //		p.subscribe(s);
+		
+		/**
+		 * 동기화 구현
+		 */
 
 		        Iterable<Integer> itr = Arrays.asList(1, 2, 3, 4, 5);
 		        ExecutorService es = Executors.newSingleThreadExecutor(); // for 병렬처리
