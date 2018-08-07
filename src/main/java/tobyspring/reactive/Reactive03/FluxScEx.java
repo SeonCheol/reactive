@@ -24,15 +24,20 @@ public class FluxScEx {
 //        TimeUnit.SECONDS.sleep(5);
 
         /* 2-1 */
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException e) {
-            }
-            log.debug("Hello");
-        });
-        log.debug("exit");
+//        Executors.newSingleThreadExecutor().execute(() -> {
+//            try {
+//                TimeUnit.SECONDS.sleep(2);
+//            } catch (InterruptedException e) {
+//            }
+//            log.debug("Hello");
+//        });
+//        log.debug("exit");
 
+        /* 2-2 */
+        Flux.interval(Duration.ofMillis(500))
+                .take(5)
+                .subscribe(s -> log.debug("onNext:{}", s));
+        TimeUnit.SECONDS.sleep(5);
 
     }
 }

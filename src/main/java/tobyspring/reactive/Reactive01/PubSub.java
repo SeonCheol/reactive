@@ -125,9 +125,9 @@ public class PubSub {
 		 * 동기화 구현
 		 */
 
-		        Iterable<Integer> itr = Arrays.asList(1, 2, 3, 4, 5);
-		        ExecutorService es = Executors.newSingleThreadExecutor(); // for 병렬처리
-		
+		        Iterable<Integer> itr = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+//		        ExecutorService es = Executors.newSingleThreadExecutor(); // for 병렬처리
+		ExecutorService es = Executors.newFixedThreadPool(2);
 		        Publisher p = new Publisher() {
 		            Iterator<Integer> it = itr.iterator();
 		
@@ -138,7 +138,7 @@ public class PubSub {
 		                    @Override
 		                    public void request(long n) {
 		
-		                        es.execute(() -> {
+		                        es.submit(() -> {
 		//                        Future<?> future = es.submit(() -> {
 		                            try {
 		                                int i = 0;
@@ -174,7 +174,7 @@ public class PubSub {
 		                System.out.println("onSubscribe()");
 		//                subscription.request(Long.MAX_VALUE);
 		                this.subscription = subscription;
-		                this.subscription.request(1);
+		                this.subscription.request(3);
 		            }
 		
 		            @Override
