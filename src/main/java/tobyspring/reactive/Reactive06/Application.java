@@ -41,7 +41,7 @@ public class Application {
             Completion
                     .from(rt.getForEntity(URL1, String.class, "h" + idx))
                     .andApply(s -> rt.getForEntity(URL2, String.class, s.getBody()))
-                    .andApply(s -> myService.work(s.getBody()))
+//                    .andApply(s -> myService.work(s.getBody()))
                     .andError(e -> dr.setErrorResult(e))
                     .andAccept(s -> dr.setResult(s.getBody()));
 
