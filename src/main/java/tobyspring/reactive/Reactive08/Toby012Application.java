@@ -2,6 +2,7 @@ package tobyspring.reactive.Reactive08;
 
 import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.EnableAsync;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,15 +25,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 @SpringBootApplication
 @RestController
 @Slf4j
+@EnableAsync
 public class Toby012Application {
-	static final String URL1 = "http://localhost:8081/service?req={req}";
-	static final String URL2 = "http://localhost:8081/service2?req={req}";
+    static final String URL1 = "http://localhost:8081/service?req={req}";
+    static final String URL2 = "http://localhost:8081/service2?req={req}";
 
-	// ListenableFuture를 return
-	AsyncRestTemplate rt = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
+    // ListenableFuture를 return
+    AsyncRestTemplate rt = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
 
-	@Autowired
-	MyService myService;
+    @Autowired
+    MyService myService;
 
 	/* 기본 코드
 	@GetMapping("/rest")
@@ -56,37 +58,38 @@ public class Toby012Application {
 		return cf;
 	}
 */
-	/* spring 5 */
-	//	@Bean
-	//	NettyReactiveWebServerFactory nettyReactiveWebServerFactory()   {
-	//		return new NettyReactiveWebServerFactory();
-	//	}
+    /* spring 5 */
+    //	@Bean
+    //	NettyReactiveWebServerFactory nettyReactiveWebServerFactory()   {
+    //		return new NettyReactiveWebServerFactory();
+    //	}
 
-	WebClient client = WebClient.create();
+    WebClient client = WebClient.create();
 
-	@GetMapping("rest")
-	public Mono<String> rest(int idx) { // Mono 혹은 Flux로 리턴
-		//		Mono<ClientResponse> res = client.get().uri(URL1, idx).exchange(); // 정의만 하는 부분
-		////	1.	ClientResponse cr = null;
-		////		Mono<String> body = cr.bodyToMono(String.class);
-		//	// 2.	Mono<Mono<String>> body = res.map(clientResponse -> clientResponse.bodyToMono(String.class)); // 다시 컨테이너에 집어넣음
-		//		Mono<String> body = res.flatMap(clientResponse -> clientResponse.bodyToMono(String.class));
-		//		return body;
+    @GetMapping("/rest")
+    public Mono<String> rest(int idx) { // Mono 혹은 Flux로 리턴
 
-		return client.get().uri(URL1, idx).exchange()               // Mono<ClientResponse>
-		             .flatMap(c -> c.bodyToMono(String.class))      // Mono<String>
-		             .flatMap((String res1) -> client.get().uri(URL2, res1).exchange())  // Mono<ClientResponse>
-		             .flatMap(c -> c.bodyToMono(String.class))     // Mono<String>
-//		             .map(res2 -> myService.work(res2));
-		//		.flatMap(res2 -> myService.work(res2));
-		             .flatMap(res2 -> Mono.fromCompletionStage(myService.work(res2))); // CompletableFuture<String> -> Mono<String>
-	}
+//		Mono<ClientResponse> res = client.get().uri(URL1, idx).exchange();
+//
+//		Mono<String> body = res.flatMap(clientResponse -> clientResponse.bodyToMono(String.class));
+//		return body;
 
-	public static void main(String[] args) {
-		System.setProperty("reactor.ipc.netty.workerCount", "2");
-		System.setProperty("reactor.ipc.netty.pool.maxConnections", "2000");
-		SpringApplication.run(Toby012Application.class, args);
-	}
+
+        return client.get().uri(URL1, idx).exchange()               // Mono<ClientResponse>
+                .flatMap(c -> c.bodyToMono(String.class))      // Mono<String>
+                .doOnNext(c -> log.info(c.toString()))
+                .flatMap((String res1) -> client.get().uri(URL2, res1).exchange())
+                .flatMap(c -> c.bodyToMono(String.class))     // Mono<String>
+                .doOnNext(c -> log.info(c.toString()))
+                .flatMap(res2 -> Mono.fromCompletionStage(myService.work(res2)))
+                .doOnNext(c -> log.info(c.toString()));
+    }
+
+    public static void main(String[] args) {
+        System.setProperty("reactor.ipc.netty.workerCount", "1");
+        System.setProperty("reactor.ipc.netty.pool.maxConnections", "2000");
+        SpringApplication.run(Toby012Application.class, args);
+    }
 
 //	@Service
 //	@Async
@@ -96,13 +99,13 @@ public class Toby012Application {
 //		}
 //	}
 
-	@Service
-	@Async
-	public static class MyService {
-		@Async
-		public CompletableFuture<String> work(String req) {
-			return CompletableFuture.completedFuture(req + "/asyncwork");
-		}
-	}
+    @Service
+    @Async
+    public static class MyService {
+        @Async
+        public CompletableFuture<String> work(String req) {
+            return CompletableFuture.completedFuture(req + "/asyncwork");
+        }
+    }
 
 }
